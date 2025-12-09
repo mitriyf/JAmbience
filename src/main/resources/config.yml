@@ -1,0 +1,69 @@
+###########################################################
+#                        JAmbience                        #
+#                           1.1                           #
+###########################################################
+
+# Требования для работы плагина:
+# - Доступ к интернету.
+# - Paper (Bukkit, Spigot и другие ядра не тестировались).
+
+# Команды:
+# /jambience reload - Перезагрузить конфигурацию плагина.
+# /jambience update - Обновить информацию о погоде -> обязательно.
+
+# Настройки.
+settings:
+  # Вставьте hex или minimessage
+  # minimessage - для Paper, 1.18+.
+  # hex - Это работает с 1.16.5, но он поддерживает и обычные режимы работы.
+  translate: hex
+  # API.
+  api:
+    # URL для получения данных о погоде. В плагине используется OpenWeatherMap API.
+    url: "https://api.openweathermap.org/data/2.5/weather?lat=55,333&lon=86,083&units=metric&appid=8545d36ae53538c27e71ab4a564536aa"
+    # Время обновления запроса URL.
+    update: 600
+  supports: # Поддерживается.
+    plugins: # Плагины, которые поддерживает плагин.
+      placeholderAPI: false # Включать ли поддержку плагина PlaceholderAPI?
+    functions:
+      weather:
+        # Включить ли регулировку погоды?
+        enabled: true
+        # Вы можете добавлять свои типы, если они тут не все.
+        types:
+          clear: "&bБезоблачно"
+          clouds: "&fОблачно"
+          snow: "&bСнегопад"
+          rain: "&9Дождь"
+          mist: "&8Туман"
+          smoke: "&8Туман"
+          storm: "&7Шторм"
+        # Эмодзи.
+        emojis:
+          # Снежный эмодзи.
+          snow: "&b%temperature%° &f❄"
+          # Летний эмодзи.
+          sunny: "&e%temperature%° ☀"
+        # Установка дистанции по результатам API.
+        viewDistance: true
+        # Включить эффект мороза?
+        freeze: true
+        # Снег.
+        snow:
+          # Радиус в блоках, где будет появляться снег.
+          radius: 64
+          # Значение по умолчанию, если будет снег.
+          defaultSnow: 9
+          # Множитель снега.
+          multiplier: 1
+# Сообщения.
+messages:
+  noperm:
+    - "[message] &cУ вас недостаточно прав."
+  help:
+    - "[message] &aПомощь:"
+    - "[message] &a/jambience reload &f- Перезагрузить конфигурацию плагина."
+    - "[message] &a/jambience status &f- Получить статус плагина."
+    - "[message] &a/jambience set значение число &f- Установить параметр для погоды."
+    - "[message] &a/jambience update &f- Обновить информацию с WeatherAPI."

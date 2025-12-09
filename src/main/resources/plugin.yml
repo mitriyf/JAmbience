@@ -1,0 +1,9 @@
+name: JAmbience
+version: '1.1'
+main: ru.mitriyf.jambience.JAmbience
+authors: [ Mitriyf, JDevs ]
+api-version: 1.17
+softdepend: [ PlaceholderAPI ]
+commands:
+  jambience:
+    aliases: [ jamb ]

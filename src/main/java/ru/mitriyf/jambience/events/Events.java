@@ -1,26 +1,24 @@
 package ru.mitriyf.jambience.events;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
 import ru.mitriyf.jambience.JAmbience;
+import ru.mitriyf.jambience.utils.Utils;
 import ru.mitriyf.jambience.values.Values;
 import ru.mitriyf.jambience.weather.Weather;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 public class Events {
+    private final Utils utils;
     private final Values values;
     private final Weather weather;
     private final JAmbience plugin;
@@ -29,22 +27,21 @@ public class Events {
     private final Map<UUID, BukkitTask> sound = new HashMap<>();
     private final Map<UUID, BukkitTask> temperature = new HashMap<>();
     private BukkitTask weatherTask, fullTime, update;
-    @Setter
-    private boolean on = true;
 
     public Events(JAmbience plugin) {
         this.plugin = plugin;
         rnd = plugin.getRnd();
+        utils = plugin.getUtils();
         values = plugin.getValues();
         weather = plugin.getWeather();
-        scheduler = plugin.getScheduler();
+        scheduler = plugin.getServer().getScheduler();
     }
 
     public void start() {
         if (values.isWeatherEnabled() && update == null) {
-            update = scheduler.runTaskTimer(plugin, weather::update, 0, 600 * 20);
-            weatherTask = scheduler.runTaskTimer(plugin, this::weather, 2, 2);
-            fullTime = scheduler.runTaskTimer(plugin, this::setFullTime, 0, 30 * 20);
+            update = scheduler.runTaskTimerAsynchronously(plugin, weather::update, 0, values.getApiUpdate() * 20L);
+            weatherTask = scheduler.runTaskTimerAsynchronously(plugin, this::weather, 2, 2);
+            fullTime = scheduler.runTaskTimerAsynchronously(plugin, this::setFullTime, 0, 30 * 20);
         } else if (update != null) {
             update.cancel();
             weatherTask.cancel();
@@ -52,48 +49,44 @@ public class Events {
             update = null;
             weatherTask = null;
             fullTime = null;
+            start();
         }
     }
 
     private void weather() {
-        scheduler.runTaskAsynchronously(plugin, () -> {
-            if (!on) {
-                return;
-            } else if (Bukkit.getOnlinePlayers().isEmpty()) {
-                on = false;
-                return;
+        double[] tps = plugin.getServer().getTPS();
+        Collection<? extends Player> onlinePlayers = plugin.getServer().getOnlinePlayers();
+        if (tps[0] <= 19.5 || onlinePlayers.isEmpty()) {
+            return;
+        }
+        for (Player p : onlinePlayers) {
+            if (values.isViewDistance() && p.getViewDistance() != weather.getVisibility() && p.getLocation().getWorld() != null) {
+                p.setViewDistance(weather.getVisibility());
             }
-            double[] tps = Bukkit.getTPS();
-            if (tps[0] <= 19.5) {
-                return;
+            UUID uuid = p.getUniqueId();
+            if (!utils.isTemperature() && values.isFreeze() && weather.getFreezeTicks() != 0 && temperature.get(uuid) == null) {
+                startTemp(p);
             }
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                if (p.getViewDistance() != weather.getVisibility() && p.getLocation().getWorld() != null) {
-                    p.setViewDistance(weather.getVisibility());
-                }
-                if (values.isFreeze() && weather.getFreezeTicks() != 0 && temperature.get(p.getUniqueId()) == null) {
-                    startTemp(p);
-                }
-                if (sound.get(p.getUniqueId()) == null) {
-                    startSound(p);
-                }
-                startSnow(p);
+            if (sound.get(uuid) == null) {
+                startSound(p, uuid);
             }
-        });
+            startSnow(p);
+        }
     }
 
-    private void startSound(Player p) {
+    private void startSound(Player p, UUID uuid) {
         p.playSound(p.getLocation(), Sound.ITEM_ELYTRA_FLYING, (float) weather.getWindVolume(), 1F);
-        sound.put(p.getUniqueId(), scheduler.runTaskLater(plugin, () -> sound.remove(p.getUniqueId()), 200));
+        sound.put(uuid, scheduler.runTaskLater(plugin, () -> sound.remove(uuid), 200));
     }
 
     private void startTemp(Player p) {
         temperature.put(p.getUniqueId(), new BukkitRunnable() {
             @Override
             public void run() {
-                if (weather.getFreezeTicks() < 50) {
-                    p.setFreezeTicks(weather.getFreezeTicks());
-                    if (weather.getFreezeTicks() == 0) {
+                int freezeTicks = weather.getFreezeTicks();
+                if (freezeTicks < 50) {
+                    p.setFreezeTicks(freezeTicks);
+                    if (freezeTicks == 0) {
                         cancel();
                     }
                 }
@@ -118,16 +111,14 @@ public class Events {
     }
 
     private void setFullTime() {
-        scheduler.runTaskAsynchronously(plugin, () -> {
-            DateFormat df = new SimpleDateFormat("HH:mm");
-            String[] date = df.format(new Date()).split(":");
-            int h = Integer.parseInt(date[0]);
-            int m = Integer.parseInt(date[1]);
-            long fullTime = getTime(h) + Math.round(m * 16.7);
-            for (World w : plugin.getServer().getWorlds()){
-                scheduler.runTask(plugin, () -> w.setFullTime(fullTime));
-            }
-        });
+        DateFormat df = new SimpleDateFormat("HH:mm");
+        String[] date = df.format(new Date()).split(":");
+        int h = utils.formatInt(date[0]);
+        int m = utils.formatInt(date[1]);
+        long fullTime = getTime(h) + Math.round(m * 16.7);
+        for (World w : plugin.getServer().getWorlds()){
+            scheduler.runTask(plugin, () -> w.setFullTime(fullTime));
+        }
     }
 
     private int getTime(int h) {

@@ -8,6 +8,7 @@ import ru.mitriyf.jambience.utils.Utils;
 import ru.mitriyf.jambience.values.Values;
 import ru.mitriyf.jambience.weather.Weather;
 
+@SuppressWarnings("NullableProblems")
 public class AmbienceCommand implements CommandExecutor {
     private final JAmbience plugin;
     private final Weather weather;
@@ -17,8 +18,8 @@ public class AmbienceCommand implements CommandExecutor {
     public AmbienceCommand(JAmbience plugin) {
         this.plugin = plugin;
         utils = plugin.getUtils();
-        weather = plugin.getWeather();
         values = plugin.getValues();
+        weather = plugin.getWeather();
     }
 
     @Override
@@ -52,52 +53,7 @@ public class AmbienceCommand implements CommandExecutor {
                 return false;
             }
             case "set": {
-                if (args.length == 1) {
-                    utils.sendMessage(sender, values.getHelp());
-                    return false;
-                }
-                double i;
-                try {
-                    i = Double.parseDouble(args[2]);
-                } catch (Exception e) {
-                    sender.sendMessage("Вставьте число, а не текст.");
-                    return false;
-                }
-                switch (args[1].toLowerCase()) {
-                    case "windspeed": {
-                        weather.setWindSpeed(i);
-                        break;
-                    }
-                    case "temperature": {
-                        weather.setTemp(i);
-                        break;
-                    }
-                    case "snowamount": {
-                        weather.setSnowAmount(i);
-                        break;
-                    }
-                    case "windvolume": {
-                        weather.setWindVolume(i);
-                        break;
-                    }
-                    case "fallspeed": {
-                        weather.setFallSpeed(i);
-                        break;
-                    }
-                    case "freezeticks": {
-                        weather.setFreezeTicks((int) i);
-                        break;
-                    }
-                    case "visibility": {
-                        weather.setVisibility((int) i);
-                        break;
-                    }
-                    default: {
-                        sender.sendMessage("Используйте следующие типы:\n[windSpeed, temperature, snowAmount, windVolume, fallSpeed, freezeTicks, visibility]");
-                        return false;
-                    }
-                }
-                sender.sendMessage("Успешно!");
+                setWeather(sender, args);
                 return false;
             }
             default: {
@@ -105,5 +61,54 @@ public class AmbienceCommand implements CommandExecutor {
                 return false;
             }
         }
+    }
+
+    private void setWeather(CommandSender sender,String[] args) {
+        if (args.length == 1) {
+            utils.sendMessage(sender, values.getHelp());
+            return;
+        }
+        double i;
+        try {
+            i = Double.parseDouble(args[2]);
+        } catch (Exception e) {
+            sender.sendMessage("Вставьте число, а не текст.");
+            return;
+        }
+        switch (args[1].toLowerCase()) {
+            case "windspeed": {
+                weather.setWindSpeed(i);
+                break;
+            }
+            case "temperature": {
+                weather.setTemp(i);
+                break;
+            }
+            case "snowamount": {
+                weather.setSnowAmount(i);
+                break;
+            }
+            case "windvolume": {
+                weather.setWindVolume(i);
+                break;
+            }
+            case "fallspeed": {
+                weather.setFallSpeed(i);
+                break;
+            }
+            case "freezeticks": {
+                weather.setFreezeTicks((int) i);
+                break;
+            }
+            case "visibility": {
+                weather.setVisibility((int) i);
+                break;
+            }
+            default: {
+                sender.sendMessage("Используйте следующие типы:\n[windSpeed, temperature, snowAmount, windVolume, fallSpeed, freezeTicks, visibility]");
+                return;
+            }
+        }
+        sender.sendMessage("Успешно!");
     }
 }

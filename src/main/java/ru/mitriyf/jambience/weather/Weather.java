@@ -22,7 +22,7 @@ public class Weather {
     private final ThreadLocalRandom rnd;
     private final BukkitScheduler scheduler;
     @Setter
-    private double windSpeed = 1, windVolume = 0, temp = 1, snowAmount = 0, fallSpeed = 1, offsetX = 1.45, offsetZ = -0.83;
+    private double windSpeed = 1, windVolume = 0, temp = 1, snowAmount = 0, fallSpeed = -0.1, offsetX = 1.45, offsetZ = -0.83;
     @Setter
     private int visibility = 2, freezeTicks = 0;
     private String status = "Clear";
@@ -32,17 +32,15 @@ public class Weather {
         rnd = plugin.getRnd();
         values = plugin.getValues();
         logger = plugin.getLogger();
-        scheduler = plugin.getScheduler();
+        scheduler = plugin.getServer().getScheduler();
     }
 
     public void update() {
-        scheduler.runTaskAsynchronously(plugin, () -> {
-            try {
-                processUpdate();
-            } catch (Exception e) {
-                logger.warning("[ОТКЛОНЕНО] Подключение произошло неудачно. Данные не были обновлены.");
-            }
-        });
+        try {
+            processUpdate();
+        } catch (Exception e) {
+            logger.warning("[ОТКЛОНЕНО] Подключение произошло неудачно. Данные не были обновлены.");
+        }
     }
 
     private void processUpdate() throws Exception {

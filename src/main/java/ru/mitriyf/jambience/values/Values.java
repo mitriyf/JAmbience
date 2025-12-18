@@ -21,13 +21,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Getter
-@SuppressWarnings("all")
+@SuppressWarnings("DataFlowIssue")
 public class Values {
     private final Logger logger;
     private final JAmbience plugin;
     private final Map<String, String> weatherTypes = new HashMap<>();
     private final Pattern action_pattern = Pattern.compile("\\[(\\w+)] ?(.*)");
-    private boolean placeholderAPI, viewDistance, weatherEnabled, miniMessage, freeze;
+    private boolean placeholderAPI, viewDistance, weatherEnabled, torchesEnabled, miniMessage, freeze;
     private List<Action> noperm = new ArrayList<>();
     private List<Action> help = new ArrayList<>();
     private double radiusSnow, multiplierSnow;
@@ -63,6 +63,7 @@ public class Values {
             return;
         }
         setupMessages(messages);
+        plugin.getEvents().start();
     }
 
     private void setupSettings(ConfigurationSection settings) {
@@ -99,6 +100,8 @@ public class Values {
         radiusSnow = snow.getDouble("radius");
         defaultSnow = snow.getInt("defaultSnow");
         multiplierSnow = snow.getDouble("multiplier");
+        ConfigurationSection torches = functions.getConfigurationSection("torches");
+        torchesEnabled = torches.getBoolean("enabled");
     }
 
     private void setupMessages(ConfigurationSection messages) {

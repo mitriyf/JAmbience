@@ -23,10 +23,15 @@ settings:
     url: "https://api.openweathermap.org/data/2.5/weather?lat=55,333&lon=86,083&units=metric&appid=8545d36ae53538c27e71ab4a564536aa"
     # Время обновления запроса URL.
     update: 600
-  supports: # Поддерживается.
-    plugins: # Плагины, которые поддерживает плагин.
-      placeholderAPI: false # Включать ли поддержку плагина PlaceholderAPI?
+  # Поддерживается.
+  supports:
+    # Плагины, которые поддерживает плагин.
+    plugins:
+      # Включать ли поддержку плагина PlaceholderAPI?
+      placeholderAPI: false
+    # Функции.
     functions:
+      # Погода.
       weather:
         # Включить ли регулировку погоды?
         enabled: true
@@ -57,6 +62,11 @@ settings:
           defaultSnow: 9
           # Множитель снега.
           multiplier: 1
+      # Факелы ломаются при дожде.
+      torches:
+        # Включить?
+        enabled: true
+
 # Сообщения.
 messages:
   noperm:

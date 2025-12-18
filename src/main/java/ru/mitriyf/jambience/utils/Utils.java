@@ -5,12 +5,10 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitScheduler;
 import ru.mitriyf.jambience.JAmbience;
 import ru.mitriyf.jambience.utils.common.CommonUtils;
+import ru.mitriyf.jambience.utils.common.TorchUtils;
 import ru.mitriyf.jambience.values.Values;
 import ru.mitriyf.jambience.utils.actions.Action;
 import ru.mitriyf.jambience.utils.actions.ActionType;
-import ru.mitriyf.jambience.utils.actions.titles.Title;
-import ru.mitriyf.jambience.utils.actions.titles.impl.Title10;
-import ru.mitriyf.jambience.utils.actions.titles.impl.Title11;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -23,37 +21,33 @@ public class Utils {
     private final Logger logger;
     private final JAmbience plugin;
     private final CountDownLatch latch;
+    private final TorchUtils torchUtils;
     private final CommonUtils commonUtils;
     private final BukkitScheduler scheduler;
-    private boolean actionBar = false, bar = false, tit = false;
-    private Title title;
+    private boolean temperature = false, actionBar = false, bar = false;
 
     public Utils(JAmbience plugin) {
         this.plugin = plugin;
         values = plugin.getValues();
         logger = plugin.getLogger();
         latch = new CountDownLatch(1);
-        scheduler = plugin.getScheduler();
+        scheduler = plugin.getServer().getScheduler();
+        torchUtils = new TorchUtils(this, plugin);
         commonUtils = new CommonUtils(this, plugin);
     }
 
     public void setup() {
         int version = plugin.getVersion();
+        if (version < 17) {
+            temperature = true;
+        }
         if (version < 13) {
-            if (version < 8) {
-                tit = true;
-            }
             if (version < 9) {
                 bar = true;
             }
         }
         if (version < 11) {
             actionBar = true;
-            if (!tit) {
-                title = new Title10();
-            }
-        } else {
-            title = new Title11();
         }
     }
 
@@ -84,7 +78,7 @@ public class Utils {
                 break;
             case DELAY:
                 try {
-                    if (latch.await(Integer.parseInt(context) * 50L, TimeUnit.MILLISECONDS)) {
+                    if (latch.await(formatInt(context) * 50L, TimeUnit.MILLISECONDS)) {
                         break;
                     }
                 } catch (Exception ignored) {
@@ -120,6 +114,10 @@ public class Utils {
 
     public String formatString(String s) {
         return values.getColorizer().colorize(s);
+    }
+
+    public int formatInt(String text) {
+        return Integer.parseInt(text);
     }
 
     private void log(String log) {

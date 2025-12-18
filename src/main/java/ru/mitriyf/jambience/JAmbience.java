@@ -1,12 +1,11 @@
 package ru.mitriyf.jambience;
 
 import lombok.Getter;
-import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitScheduler;
 import ru.mitriyf.jambience.cmd.AmbienceCommand;
 import ru.mitriyf.jambience.events.Events;
-import ru.mitriyf.jambience.listeners.PlayerListener;
+import ru.mitriyf.jambience.listeners.WorldListener;
 import ru.mitriyf.jambience.utils.Utils;
 import ru.mitriyf.jambience.values.Values;
 import ru.mitriyf.jambience.weather.Weather;
@@ -14,14 +13,14 @@ import ru.mitriyf.jambience.weather.Weather;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
+@SuppressWarnings("DataFlowIssue")
 public final class JAmbience extends JavaPlugin {
     private final ThreadLocalRandom rnd = ThreadLocalRandom.current();
-    private final BukkitScheduler scheduler = Bukkit.getScheduler();
-    private int version;
     private Weather weather;
     private Values values;
-    private Utils utils;
     private Events events;
+    private Utils utils;
+    private int version;
 
     @Override
     public void onEnable() {
@@ -31,12 +30,12 @@ public final class JAmbience extends JavaPlugin {
         values = new Values(this);
         utils = new Utils(this);
         weather = new Weather(this);
+        events = new Events(this);
         values.setup();
         utils.setup();
-        events = new Events(this);
-        events.start();
         getCommand("jambience").setExecutor(new AmbienceCommand(this));
-        getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
+        PluginManager manager = getServer().getPluginManager();
+        manager.registerEvents(new WorldListener(this), this);
     }
 
     @Override

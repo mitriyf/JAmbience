@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.bukkit.plugin.java.JavaPlugin;
 import ru.mitriyf.jambience.command.JAmbienceCommand;
 import ru.mitriyf.jambience.events.WeatherEvents;
+import ru.mitriyf.jambience.listener.WorldListener;
 import ru.mitriyf.jambience.manager.WeatherManager;
 import ru.mitriyf.jambience.utils.Utils;
 import ru.mitriyf.jambience.values.Values;
@@ -32,6 +33,7 @@ public final class JAmbience extends JavaPlugin {
         weatherEvents = new WeatherEvents(this);
         values.setup();
         getCommand("jambience").setExecutor(new JAmbienceCommand(this));
+        getServer().getPluginManager().registerEvents(new WorldListener(this), this);
     }
 
     @Override

@@ -4,46 +4,60 @@ import me.clip.placeholderapi.expansion.PlaceholderExpansion;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import ru.mitriyf.jambience.JAmbience;
+import ru.mitriyf.jambience.manager.WeatherManager;
 import ru.mitriyf.jambience.values.Values;
-import ru.mitriyf.jambience.weather.Weather;
+
+import java.time.LocalTime;
 
 public class Placeholders extends PlaceholderExpansion {
-    private final Weather weather;
+    private final WeatherManager weatherManager;
     private final Values values;
 
     public Placeholders(JAmbience plugin) {
-        weather = plugin.getWeather();
         values = plugin.getValues();
+        weatherManager = plugin.getWeatherManager();
     }
 
     @Override
-    public String onPlaceholderRequest(Player p, @NotNull String ind) {
-        if (p == null) {
+    public String onPlaceholderRequest(Player player, @NotNull String ind) {
+        if (player == null) {
             return null;
         }
         String[] args = ind.split("_");
         if (args.length >= 1) {
+            boolean isCold = weatherManager.isCold();
             switch (args[0].toLowerCase()) {
                 case "windspeed": {
-                    return String.valueOf(Math.round((float) weather.getWindSpeed()));
+                    return String.valueOf(Math.round((float) weatherManager.getWindSpeed()));
                 }
-                case "temp": {
-                    int temp = Math.round((float) weather.getTemp());
-                    if (temp <= 12) {
-                        return values.getSnow().replace("%temperature%", String.valueOf(temp));
-                    } else {
-                        return values.getSunny().replace("%temperature%", String.valueOf(temp));
-                    }
+                case "winddeg": {
+                    return String.valueOf(Math.round(weatherManager.getWindDeg()));
+                }
+                case "temperature": {
+                    String tempStr = isCold ? values.getSnowTemperature() : values.getSunnyTemperature();
+                    return tempStr.replace("%temperature%", String.valueOf(weatherManager.getTemperature()));
+                }
+                case "color": {
+                    return isCold ? values.getSnowColor() : values.getSunnyColor();
+                }
+                case "emoji": {
+                    return isCold ? values.getSnowEmoji() : values.getSunnyEmoji();
                 }
                 case "visibility": {
-                    return String.valueOf(weather.getVisibility());
+                    return String.valueOf(weatherManager.getVisibility());
                 }
                 case "event": {
-                    String status = weather.getStatus().toLowerCase();
+                    String status = weatherManager.getStatus().toLowerCase();
                     return values.getWeatherTypes().getOrDefault(status, status);
                 }
-                case "snow": {
-                    return String.valueOf(Math.round((float) weather.getSnowAmount()));
+                case "time": {
+                    return LocalTime.now(values.getZoneId()).format(values.getDateTimeFormatter());
+                }
+                case "name": {
+                    return values.getCityName();
+                }
+                case "amount": {
+                    return String.valueOf(Math.round((float) weatherManager.getCurrentAmount()));
                 }
             }
         }
@@ -67,6 +81,6 @@ public class Placeholders extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getVersion() {
-        return "1.0.0";
+        return "1.1";
     }
 }

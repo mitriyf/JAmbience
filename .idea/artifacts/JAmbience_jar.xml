@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="JAmbience:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/JAmbience_jar</output-path>
+    <root id="archive" name="JAmbience.jar">
+      <element id="module-output" name="JAmbience" />
+    </root>
+  </artifact>
+</component>

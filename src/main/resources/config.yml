@@ -3,77 +3,477 @@
 #                           1.1                           #
 ###########################################################
 
-# Требования для работы плагина:
-# - Доступ к интернету.
-# - Paper (Bukkit, Spigot и другие ядра не тестировались).
+# Commands:
+# /jambience reload - Reload the plugin configuration.
+# /jambience update - Update weather information -> required.
 
-# Команды:
-# /jambience reload - Перезагрузить конфигурацию плагина.
-# /jambience update - Обновить информацию о погоде -> обязательно.
-
-# Настройки.
+# Settings.
 settings:
-  # Вставьте hex или minimessage
-  # minimessage - для Paper, 1.18+.
-  # hex - Это работает с 1.16.5, но он поддерживает и обычные режимы работы.
+  # Insert hex or minimessage
+  # minimessage - for Paper, 1.18+.
+  # hex - This has been working since 1.16.5, but it also supports normal modes of operation.
   translate: hex
-  # API.
-  api:
-    # URL для получения данных о погоде. В плагине используется OpenWeatherMap API.
-    url: "https://api.openweathermap.org/data/2.5/weather?lat=55,333&lon=86,083&units=metric&appid=8545d36ae53538c27e71ab4a564536aa"
-    # Время обновления запроса URL.
-    update: 600
-  # Поддерживается.
+  # Supported.
   supports:
-    # Плагины, которые поддерживает плагин.
+    # Plugins that the plugin supports.
     plugins:
-      # Включать ли поддержку плагина PlaceholderAPI?
+      # Should I enable support for the PlaceholderAPI plugin? true/false
       placeholderAPI: false
-    # Функции.
-    functions:
-      # Погода.
-      weather:
-        # Включить ли регулировку погоды?
-        enabled: true
-        # Вы можете добавлять свои типы, если они тут не все.
+  # Functions.
+  functions:
+    # Worlds settings.
+    worlds:
+      # Insert allowed/blocked
+      type: blocked
+      # List of worlds for the type.
+      list:
+        - "no"
+    # Biomes settings.
+    biomes:
+      # Insert allowed/blocked
+      type: blocked
+      # List of biomes for the type.
+      list:
+        - "no"
+    # Do we need to make the time like in real life?
+    time:
+      # Turn it on? true/false
+      enabled: true
+      # City name.
+      name: "Kemerovo"
+      # Specify the zone for which the time will be adjusted.
+      idZone: "Asia/Krasnoyarsk"
+      # Set how many ticks apart the weather task will be triggered.
+      ticks: 600
+      # Specify the time format.
+      format: "HH:mm"
+    # Weather.
+    weather:
+      # Weather settings.
+      settings:
+        # Should the weather be reset when the information is updated?
+        resetWeather: true
+        # Set how many ticks apart the time task will be launched.
+        ticks: 0
+        # Specify the cold temperature.
+        coldTemperature: 10
+        # Precipitations.
+        # Look for particles here: https://helpch.at/docs/$version$/org/bukkit/Effect.html
+        # OR here: https://helpch.at/docs/$version$/org/bukkit/Particle.html
+        # Replace $version$ with your version.
+        precipitations:
+          # Events.
+          events:
+            # Snow.
+            snow:
+              # Turn it on? true/false
+              enabled: true
+              # Particle format: PARTICLE;COUNT;SIZE;SPEED;R;G;B
+              # The size appeared only with 1.13+.
+              # In versions below 1.12.2, setting the color breaks the wind.
+              particles:
+                - "CLOUD"
+              shiftCenter: "10;0;10"
+              # The maximum degree of a circle. Only int.
+              maxStep: 8
+              # Specify the circular number.
+              circleNumber: 2
+              # Specify the spawn radius of particles between each degree.
+              radius: 1
+              # The default amount. The value without a multiplier.
+              defaultAmount: 0.9
+              # Snow multiplier.
+              multiplier: 10
+              # The weather of the world.
+              weather:
+                # Should the storm be included?
+                storm: false
+                # Specify the minimum precipitation required to activate the storm, taking into account the multiplier.
+                minimum: 30
+            # Rain.
+            rain:
+              enabled: true
+              particles:
+                - "WATER_WAKE"
+                - "SPLASH"
+              shiftCenter: "0;0;0"
+              maxStep: 8
+              circleNumber: 1.5
+              radius: 1
+              defaultAmount: 0.9
+              multiplier: 10
+              weather:
+                storm: true
+                minimum: 30
+          # Additional parcels by season.
+          seasons:
+            winter:
+              enabled: true
+              months: "12;1;2"
+              particles:
+                - "CLOUD"
+              shiftCenter: "10;0;10"
+              maxStep: 8
+              circleNumber: 2
+              radius: 1
+              defaultAmount: 0.2
+              multiplier: 10
+            spring:
+              enabled: true
+              months: "3;4;5"
+              particles:
+                - "REDSTONE;0;1;1;153;153;0"
+                - "COLOURED_DUST;0;1;1;153;153;0"
+              shiftCenter: "0;0;0"
+              maxStep: 8
+              circleNumber: 2
+              radius: 1
+              defaultAmount: 0.3
+              multiplier: 10
+            summer:
+              enabled: true
+              months: "6;7;8"
+              particles:
+                - "REDSTONE;0;1;1;128;255;0"
+                - "COLOURED_DUST;0;1;1;128;255;0"
+              shiftCenter: "0;0;0"
+              maxStep: 8
+              circleNumber: 2
+              radius: 1
+              defaultAmount: 0.2
+              multiplier: 10
+            autumn:
+              enabled: true
+              months: "9;10;11"
+              particles:
+                - "REDSTONE;0;1;1;208;122;4"
+                - "COLOURED_DUST;0;1;1;208;122;4"
+              shiftCenter: "0;0;0"
+              maxStep: 8
+              circleNumber: 2
+              radius: 1
+              defaultAmount: 0.3
+              multiplier: 10
+        # Events.
+        events:
+          # Wind event.
+          wind:
+            # Turn it on? true/false
+            enabled: true
+            # Speed.
+            speed:
+              # WalkSpeed.
+              walk:
+                # Should we enable speed adjustment based on wind direction? To disable the function accurately, a restart is required.
+                enabled: true
+                # Default WalkSpeed.
+                default: 0.2
+                # Specify the modifier for the player’s speed.
+                modifier: 0.1
+                # Minimum running speed.
+                minSpeed: 0.1
+                # Maximum running speed.
+                maxSpeed: 0.3
+              # Minimum speed.
+              minSpeed: 1.5
+              # Maximum speed.
+              maxSpeed: 20.8
+            # Sound settings.
+            sound:
+              # Specify the type of sound. Search for sounds here: https://helpch.at/docs/$version$/org/bukkit/Sound.html
+              # Specify in the following format: SOUND;PITCH;EVERYTICKS
+              types:
+                - "ENDERDRAGON_WINGS;0.1;5"
+                - "ITEM_ELYTRA_FLYING;1;200"
+            # Specify the smoothness of the visibility change.
+            smoothlyTicks:
+              # Smooth change in wind degrees.
+              windDeg: 40
+              # A smooth change in wind speed.
+              windSpeed: 1200
+          # Precipitation event.
+          precipitation:
+            # Turn it on? true/false
+            enabled: true
+            # Specify the wind speed coefficient.
+            ratio: 0.33
+            # Specify the maximum visibility radius of the particles. It affects performance and quality.
+            radius: 128
+            # Specify a random speed so that the particles appear real. Format: DOUBLE;DOUBLE
+            random: "0.9;1.1"
+            # Falling speed.
+            fallSpeed:
+              # Minimum falling speed.
+              minSpeed: -0.7
+              # Maximum falling speed.
+              maxSpeed: -0.1
+              # Specify the multiplier for the temperature.
+              multiplier: 0.0092
+              # Indicate the difference.
+              difference: -0.425
+            # Indicate the smoothness of the change in precipitation amount.
+            smoothlyTicks: 40
+          # Visibility event.
+          visibility:
+            # Turn it on? true/false
+            enabled: true
+            # Specify the maximum distance. It may affect the calculation based on the formula.
+            maxDistance: 10000
+            # Specify the maximum number of chunks. This affects the formula.
+            maxChunks: 32
+            # The effects of potions.
+            potionEffects:
+              # Enabled?
+              enabled: true
+              # Specify the chunks in which the potion effect will be granted.
+              chunks:
+                # Specify in chunk‑chunk format. Effect format: POTIONEFFECT;INT(DURATION);INT(AMPLIFIER);BOOLEAN(AMBIENT);BOOLEAN(PARTICLES);EVERYTICKS
+                2-2:
+                  - "DARKNESS;200;0;false;false;100"
+                0-1:
+                  - "BLINDNESS;200;0;false;false;100"
+            # Specify the smoothness of the visibility change.
+            smoothlyTicks: 400
+          # The freezing effect.
+          freeze:
+            # Turn it on? true/false
+            enabled: true
+            # The maximum number of freeze ticks.
+            maxTicks: 130
+            # The difference in degrees that changes the temperature.
+            difference: 6
+            # By how many ticks is each degree multiplied (difference)?
+            multiplier: 25
+          # Temperature event.
+          temperature:
+            # Specify the smoothness of the temperature change.
+            smoothlyTicks: 6000
+        # Special weather events.
+        specialEvents:
+          # Squall.
+          squall:
+            # Turn it on? true/false
+            enabled: true
+            # Should you reset the sprint during an impulse?
+            resetSprint: true
+            # Turn on pushing in the direction of the wind?
+            pulse: true
+            # Specify the impulse (repulsion) multiplier.
+            multiplierPulse: 0.45
+            # Specify how many ticks apart the event process will be triggered?
+            everyTicks: 150
+      # Status (Placeholders).
+      status:
+        # Available placeholders (PlaceholderAPI):
+        # %jambience_name% - City name.
+        # %jambience_emoji% - Weather emoji.
+        # %jambience_windspeed% - Wind speed.
+        # %jambience_color% - Weather status color.
+        # %jambience_temperature% - Current temperature.
+        # %jambience_winddeg% - Wind direction in degrees.
+        # %jambience_visibility% - Visibility distance in meters.
+        # %jambience_time% - Current time in the location's time zone.
+        # %jambience_event% - Translated name of the current weather event.
+        # %jambience_amount% - Current amount of spawning precipitation particles.
         types:
-          clear: "&bБезоблачно"
-          clouds: "&fОблачно"
-          snow: "&bСнегопад"
-          rain: "&9Дождь"
-          mist: "&8Туман"
-          smoke: "&8Туман"
-          storm: "&7Шторм"
-        # Эмодзи.
-        emojis:
-          # Снежный эмодзи.
-          snow: "&b%temperature%° &f❄"
-          # Летний эмодзи.
-          sunny: "&e%temperature%° ☀"
-        # Установка дистанции по результатам API.
-        viewDistance: true
-        # Включить эффект мороза?
-        freeze: true
-        # Снег.
+          clear: "Cloudless"
+          clouds: "Cloudy"
+          snow: "&bSnowfall"
+          rain: "&9Rain"
+          drizzle: "&9Drizzle"
+          thunderstorm: "&7Storm"
+          fog: "&8Fog"
+          mist: "&8Mist"
+          smoke: "&8Smoke"
+          haze: "&8Haze"
+          sand: "&eSand"
+          ash: "&8Ash"
+          squall: "&7Squall"
+          tornado: "&4Tornado"
+        # Snow.
         snow:
-          # Радиус в блоках, где будет появляться снег.
-          radius: 64
-          # Значение по умолчанию, если будет снег.
-          defaultSnow: 9
-          # Множитель снега.
-          multiplier: 1
-      # Факелы ломаются при дожде.
-      torches:
-        # Включить?
-        enabled: true
-
-# Сообщения.
+          color: "&b"
+          emoji: "° &f❄"
+          temperature: "&b%temperature%"
+        # Sunny.
+        sunny:
+          color: "&e"
+          emoji: "° ☀"
+          temperature: "&e%temperature%"
+  # Mode settings.
+  mode:
+    # Auto.
+    auto:
+      # Enabled?
+      enabled: true
+      # Specify the number of errors before attempting to switch to Manual.
+      errorsToManual: 3
+      # API.
+      api:
+        # The URL for getting weather data. The plugin uses the OpenWeatherMap API.
+        url: "https://api.openweathermap.org/data/2.5/weather?lat=55,333&lon=86,083&units=metric&appid=8545d36ae53538c27e71ab4a564536aa"
+        # The time of the URL request update.
+        update: 90
+    # Manual. Manual mode cannot be disabled, as in the event of a failure in Auto, the plugin will operate in ManualMode.
+    manual:
+      # The time of the update.
+      update: 1800
+      # Months.
+      months:
+        # Month number.
+        1:
+          temperature: "-9;-4"
+          currentAmount: "1;3"
+          visibility: "4000;8000"
+          statuses:
+            - "snow"
+            - "clouds"
+            - "clear"
+            - "squall"
+          windSpeed: "4;12"
+          windDeg: "0;360"
+          # You can add days in the same way as months.
+          days: [ ]
+        2:
+          temperature: "-8;-3"
+          currentAmount: "1;4"
+          visibility: "5000;9000"
+          statuses:
+            - "snow"
+            - "clouds"
+            - "clear"
+            - "squall"
+          windSpeed: "4;10"
+          windDeg: "0;360"
+        3:
+          temperature: "-4;2"
+          currentAmount: "1;5"
+          visibility: "6000;10000"
+          statuses:
+            - "snow"
+            - "rain"
+            - "drizzle"
+            - "clouds"
+            - "clear"
+          windSpeed: "4;8"
+          windDeg: "0;360"
+        4:
+          temperature: "2;10"
+          currentAmount: "2;6"
+          visibility: "8000;10000"
+          statuses:
+            - "rain"
+            - "drizzle"
+            - "snow"
+            - "clouds"
+            - "clear"
+          windSpeed: "3;7"
+          windDeg: "0;360"
+        5:
+          temperature: "8;18"
+          currentAmount: "2;10"
+          visibility: "9000;10000"
+          statuses:
+            - "rain"
+            - "drizzle"
+            - "thunderstorm"
+            - "clouds"
+            - "clear"
+          windSpeed: "3;7"
+          windDeg: "0;360"
+        6:
+          temperature: "12;21"
+          currentAmount: "5;15"
+          visibility: "3000;10000"
+          statuses:
+            - "rain"
+            - "drizzle"
+            - "thunderstorm"
+            - "clouds"
+            - "clear"
+            - "squall"
+          windSpeed: "2;15"
+          windDeg: "0;360"
+        7:
+          temperature: "14;23"
+          currentAmount: "5;20"
+          visibility: "5000;10000"
+          statuses:
+            - "rain"
+            - "drizzle"
+            - "thunderstorm"
+            - "clouds"
+            - "clear"
+            - "haze"
+            - "squall"
+          windSpeed: "2;12"
+          windDeg: "0;360"
+        8:
+          temperature: "12;21"
+          currentAmount: "3;15"
+          visibility: "4000;10000"
+          statuses:
+            - "rain"
+            - "drizzle"
+            - "thunderstorm"
+            - "clouds"
+            - "clear"
+            - "haze"
+          windSpeed: "2;10"
+          windDeg: "0;360"
+        9:
+          temperature: "7;15"
+          currentAmount: "2;8"
+          visibility: "4000;10000"
+          statuses:
+            - "rain"
+            - "drizzle"
+            - "clouds"
+            - "clear"
+          windSpeed: "3;8"
+          windDeg: "0;360"
+        10:
+          temperature: "2;8"
+          currentAmount: "1;5"
+          visibility: "6000;8000"
+          statuses:
+            - "rain"
+            - "drizzle"
+            - "snow"
+            - "clouds"
+            - "clear"
+          windSpeed: "3;9"
+          windDeg: "0;360"
+        11:
+          temperature: "-3;1"
+          currentAmount: "1;4"
+          visibility: "4000;7000"
+          statuses:
+            - "snow"
+            - "rain"
+            - "drizzle"
+            - "clouds"
+            - "clear"
+          windSpeed: "4;10"
+          windDeg: "0;360"
+        12:
+          temperature: "-7;-3"
+          currentAmount: "1;4"
+          visibility: "4000;8000"
+          statuses:
+            - "snow"
+            - "clouds"
+            - "clear"
+            - "squall"
+          windSpeed: "4;9"
+          windDeg: "0;360"
+# Messages.
 messages:
   noperm:
-    - "[message] &cУ вас недостаточно прав."
+    - "[message] &cYou don't have enough rights."
   help:
-    - "[message] &aПомощь:"
-    - "[message] &a/jambience reload &f- Перезагрузить конфигурацию плагина."
-    - "[message] &a/jambience status &f- Получить статус плагина."
-    - "[message] &a/jambience set значение число &f- Установить параметр для погоды."
-    - "[message] &a/jambience update &f- Обновить информацию с WeatherAPI."
+    - "[message] &aHelp:"
+    - "[message] &a/jambience reload &f- Reload the plugin configuration."
+    - "[message] &a/jambience status &f- Get the plugin status."
+    - "[message] &a/jambience set value double &f- Set the parameter for the weather."
+    - "[message] &a/jambience update &f- Update information from WeatherAPI."

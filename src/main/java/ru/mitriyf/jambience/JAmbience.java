@@ -1,41 +1,37 @@
 package ru.mitriyf.jambience;
 
 import lombok.Getter;
-import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import ru.mitriyf.jambience.cmd.AmbienceCommand;
-import ru.mitriyf.jambience.events.Events;
-import ru.mitriyf.jambience.listeners.WorldListener;
+import ru.mitriyf.jambience.command.JAmbienceCommand;
+import ru.mitriyf.jambience.events.WeatherEvents;
+import ru.mitriyf.jambience.manager.WeatherManager;
 import ru.mitriyf.jambience.utils.Utils;
 import ru.mitriyf.jambience.values.Values;
-import ru.mitriyf.jambience.weather.Weather;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 @Getter
 @SuppressWarnings("DataFlowIssue")
 public final class JAmbience extends JavaPlugin {
-    private final ThreadLocalRandom rnd = ThreadLocalRandom.current();
-    private Weather weather;
+    private final ThreadLocalRandom random = ThreadLocalRandom.current();
+    private WeatherManager weatherManager;
+    private WeatherEvents weatherEvents;
     private Values values;
-    private Events events;
     private Utils utils;
     private int version;
 
     @Override
     public void onEnable() {
         getLogger().info("Support: https://vk.com/jdevs");
+        tryGetServerVersion();
         saveDefaultConfig();
-        getVer();
         values = new Values(this);
         utils = new Utils(this);
-        weather = new Weather(this);
-        events = new Events(this);
-        values.setup();
         utils.setup();
-        getCommand("jambience").setExecutor(new AmbienceCommand(this));
-        PluginManager manager = getServer().getPluginManager();
-        manager.registerEvents(new WorldListener(this), this);
+        weatherManager = new WeatherManager(this);
+        weatherEvents = new WeatherEvents(this);
+        values.setup();
+        getCommand("jambience").setExecutor(new JAmbienceCommand(this));
     }
 
     @Override
@@ -45,12 +41,20 @@ public final class JAmbience extends JavaPlugin {
         }
     }
 
-    private void getVer() {
-        String ver = getServer().getBukkitVersion().split("-")[0].split("\\.")[1];
-        if (ver.length() >= 2) {
-            version = Integer.parseInt(ver.substring(0, 2));
-        } else {
-            version = Integer.parseInt(ver);
+    private void tryGetServerVersion() {
+        try {
+            String[] serverVersion = getServer().getBukkitVersion().split("-")[0].split("\\.");
+            String subVersion = serverVersion[1];
+            if (Integer.parseInt(serverVersion[0]) > 1) {
+                version = 26;
+            } else if (subVersion.length() >= 2) {
+                version = Integer.parseInt(subVersion.substring(0, 2));
+            } else {
+                version = Integer.parseInt(subVersion);
+            }
+        } catch (Exception e) {
+            getLogger().info("Version check failed. Default set version 26. Error: " + e);
+            version = 26;
         }
     }
 }

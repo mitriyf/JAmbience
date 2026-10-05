@@ -1,25 +1,26 @@
-package ru.mitriyf.jambience.cmd;
+package ru.mitriyf.jambience.command;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import ru.mitriyf.jambience.JAmbience;
+import ru.mitriyf.jambience.manager.WeatherManager;
+import ru.mitriyf.jambience.mode.AutoMode;
 import ru.mitriyf.jambience.utils.Utils;
 import ru.mitriyf.jambience.values.Values;
-import ru.mitriyf.jambience.weather.Weather;
 
 @SuppressWarnings("NullableProblems")
-public class AmbienceCommand implements CommandExecutor {
+public class JAmbienceCommand implements CommandExecutor {
+    private final WeatherManager weatherManager;
     private final JAmbience plugin;
-    private final Weather weather;
     private final Values values;
     private final Utils utils;
 
-    public AmbienceCommand(JAmbience plugin) {
+    public JAmbienceCommand(JAmbience plugin) {
         this.plugin = plugin;
         utils = plugin.getUtils();
         values = plugin.getValues();
-        weather = plugin.getWeather();
+        weatherManager = plugin.getWeatherManager();
     }
 
     @Override
@@ -35,21 +36,26 @@ public class AmbienceCommand implements CommandExecutor {
         }
         switch (args[0].toLowerCase()) {
             case "reload": {
+                weatherManager.setUpdated(false);
                 plugin.getValues().setup();
-                sender.sendMessage("Успешно!");
+                sender.sendMessage("§aSuccessfully!");
+                return false;
+            }
+            case "reloadsmoothly": {
+                reload(sender);
                 return false;
             }
             case "update": {
-                weather.update();
-                sender.sendMessage("Успешно. Ожидайте...");
+                weatherManager.setUpdated(false);
+                updateSmoothly(sender);
+                return false;
+            }
+            case "updatesmoothly": {
+                updateSmoothly(sender);
                 return false;
             }
             case "status": {
-                sender.sendMessage("[ПОЛУЧЕНО] Громкость ветра: " + weather.getWindVolume() + ". Скорость ветра: " + weather.getWindSpeed() + "м/с. Температура: " + weather.getTemp() + " градусов. Видимость: " + weather.getVisibility() + " чанков.");
-                double snowAmount = weather.getSnowAmount();
-                if (snowAmount > 1) {
-                    sender.sendMessage("[ИВЕНТ] Сейчас идёт ивент снег.\nКоличество снега в 2 тика: " + snowAmount + "\nСкорость падения: " + weather.getFallSpeed());
-                }
+                weatherManager.getInformation(sender);
                 return false;
             }
             case "set": {
@@ -63,7 +69,22 @@ public class AmbienceCommand implements CommandExecutor {
         }
     }
 
-    private void setWeather(CommandSender sender,String[] args) {
+    private void reload(CommandSender sender) {
+        plugin.getValues().setup();
+        sender.sendMessage("§aSuccessfully!");
+    }
+
+    private void updateSmoothly(CommandSender sender) {
+        AutoMode autoMode = values.getAutoMode();
+        if (autoMode != null) {
+            autoMode.processUpdate();
+        } else {
+            values.getManualMode().processUpdate();
+        }
+        sender.sendMessage("§aSuccessfully. §eWait for it...");
+    }
+
+    private void setWeather(CommandSender sender, String[] args) {
         if (args.length == 1) {
             utils.sendMessage(sender, values.getHelp());
             return;
@@ -72,43 +93,43 @@ public class AmbienceCommand implements CommandExecutor {
         try {
             i = Double.parseDouble(args[2]);
         } catch (Exception e) {
-            sender.sendMessage("Вставьте число, а не текст.");
+            sender.sendMessage("§cInsert a number, not text.");
             return;
         }
         switch (args[1].toLowerCase()) {
             case "windspeed": {
-                weather.setWindSpeed(i);
+                weatherManager.setWindSpeed((int) i);
                 break;
             }
             case "temperature": {
-                weather.setTemp(i);
+                weatherManager.setTemperature((int) i);
                 break;
             }
             case "snowamount": {
-                weather.setSnowAmount(i);
+                weatherManager.setCurrentAmount((int) i);
                 break;
             }
             case "windvolume": {
-                weather.setWindVolume(i);
+                weatherManager.setWindVolume(i);
                 break;
             }
             case "fallspeed": {
-                weather.setFallSpeed(i);
+                weatherManager.setFallSpeed(i);
                 break;
             }
             case "freezeticks": {
-                weather.setFreezeTicks((int) i);
+                weatherManager.setFreezeTicks((int) i);
                 break;
             }
             case "visibility": {
-                weather.setVisibility((int) i);
+                weatherManager.setVisibility((int) i);
                 break;
             }
             default: {
-                sender.sendMessage("Используйте следующие типы:\n[windSpeed, temperature, snowAmount, windVolume, fallSpeed, freezeTicks, visibility]");
+                sender.sendMessage("§eUse the following types:\n§a[windSpeed, temperature, snowAmount, windVolume, fallSpeed, freezeTicks, visibility]");
                 return;
             }
         }
-        sender.sendMessage("Успешно!");
+        sender.sendMessage("§aSuccessfully!");
     }
 }

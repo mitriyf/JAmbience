@@ -35,14 +35,17 @@ public class JAmbienceCommand implements CommandExecutor {
             return false;
         }
         switch (args[0].toLowerCase()) {
+            case "status": {
+                weatherManager.getInformation(sender);
+                return false;
+            }
             case "reload": {
                 weatherManager.setUpdated(false);
-                plugin.getValues().setup();
-                sender.sendMessage("§aSuccessfully!");
+                reloadSmoothly(sender);
                 return false;
             }
             case "reloadsmoothly": {
-                reload(sender);
+                reloadSmoothly(sender);
                 return false;
             }
             case "update": {
@@ -54,12 +57,8 @@ public class JAmbienceCommand implements CommandExecutor {
                 updateSmoothly(sender);
                 return false;
             }
-            case "status": {
-                weatherManager.getInformation(sender);
-                return false;
-            }
             case "set": {
-                setWeather(sender, args);
+                setWeatherValue(sender, args);
                 return false;
             }
             default: {
@@ -69,7 +68,7 @@ public class JAmbienceCommand implements CommandExecutor {
         }
     }
 
-    private void reload(CommandSender sender) {
+    private void reloadSmoothly(CommandSender sender) {
         plugin.getValues().setup();
         sender.sendMessage("§aSuccessfully!");
     }
@@ -84,7 +83,7 @@ public class JAmbienceCommand implements CommandExecutor {
         sender.sendMessage("§aSuccessfully. §eWait for it...");
     }
 
-    private void setWeather(CommandSender sender, String[] args) {
+    private void setWeatherValue(CommandSender sender, String[] args) {
         if (args.length == 1) {
             utils.sendMessage(sender, values.getHelp());
             return;
@@ -96,7 +95,11 @@ public class JAmbienceCommand implements CommandExecutor {
             sender.sendMessage("§cInsert a number, not text.");
             return;
         }
-        switch (args[1].toLowerCase()) {
+        setValue(sender, args[1].toLowerCase(), i);
+    }
+
+    private void setValue(CommandSender sender, String key, double i) {
+        switch (key) {
             case "windspeed": {
                 weatherManager.setWindSpeed((int) i);
                 break;
@@ -105,7 +108,7 @@ public class JAmbienceCommand implements CommandExecutor {
                 weatherManager.setTemperature((int) i);
                 break;
             }
-            case "snowamount": {
+            case "currentamount": {
                 weatherManager.setCurrentAmount((int) i);
                 break;
             }
@@ -125,11 +128,33 @@ public class JAmbienceCommand implements CommandExecutor {
                 weatherManager.setVisibility((int) i);
                 break;
             }
+            case "event": {
+                processEvent((int) i);
+                break;
+            }
+            case "squall": {
+                processSquall((int) i);
+                break;
+            }
             default: {
-                sender.sendMessage("§eUse the following types:\n§a[windSpeed, temperature, snowAmount, windVolume, fallSpeed, freezeTicks, visibility]");
+                sender.sendMessage("§eUse the following types:\n§a[windSpeed, temperature, currentAmount, windVolume, fallSpeed, freezeTicks, visibility, event (0, 1, 2), squall (0, 1)]");
                 return;
             }
         }
         sender.sendMessage("§aSuccessfully!");
+    }
+
+    private void processEvent(int i) {
+        if (i == 1) {
+            weatherManager.setEventData(values.getRainEvent());
+        } else if (i == 2) {
+            weatherManager.setEventData(values.getSnowEvent());
+        } else {
+            weatherManager.setEventData(null);
+        }
+    }
+
+    private void processSquall(int i) {
+        weatherManager.setSquall(i == 1);
     }
 }

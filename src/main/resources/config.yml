@@ -3,9 +3,14 @@
 #                           1.1                           #
 ###########################################################
 
+# Support: https://vk.com/jdevs
+#
 # Commands:
 # /jambience reload - Reload the plugin configuration.
 # /jambience update - Update weather information -> required.
+#
+# Permissions:
+# jambience.use - Permission to use the command.
 
 # Settings.
 settings:
@@ -305,13 +310,21 @@ settings:
     # Auto.
     auto:
       # Enabled?
-      enabled: true
+      enabled: false
       # Specify the number of errors before attempting to switch to Manual.
       errorsToManual: 3
       # API.
       api:
         # The URL for getting weather data. The plugin uses the OpenWeatherMap API.
-        url: "https://api.openweathermap.org/data/2.5/weather?lat=55,333&lon=86,083&units=metric&appid=8545d36ae53538c27e71ab4a564536aa"
+        # If you need help, please contact the plugin developer using the links above ^^^.
+        # https://openweathermap.org/
+        # Steps for connecting.
+        # 1. Visit the website above.
+        # 2. Create your account on this service.
+        # 3. Find the API key in the account.
+        # 4. Choose a location you like, following the instructions.
+        # 5. Insert the final link here.
+        url: ""
         # The time of the URL request update.
         update: 90
     # Manual. Manual mode cannot be disabled, as in the event of a failure in Auto, the plugin will operate in ManualMode.
@@ -473,7 +486,10 @@ messages:
     - "[message] &cYou don't have enough rights."
   help:
     - "[message] &aHelp:"
-    - "[message] &a/jambience reload &f- Reload the plugin configuration."
     - "[message] &a/jambience status &f- Get the plugin status."
-    - "[message] &a/jambience set value double &f- Set the parameter for the weather."
+    - "[message] &a/jambience reload &f- Reload the plugin configuration."
+    - "[message] &a/jambience reloadSmoothly &f- Reload the configuration, but without any immediate changes."
     - "[message] &a/jambience update &f- Update information from WeatherAPI."
+    - "[message] &a/jambience updateSmoothly &f- Update information, but without any immediate changes."
+    - "[message] &a/jambience set value double/int &f- Set the parameter for the weather."
+    - "[message] &eUse the following types: &a[windSpeed, temperature, currentAmount, windVolume, fallSpeed, freezeTicks, visibility, event (0, 1, 2), squall (0, 1)]"

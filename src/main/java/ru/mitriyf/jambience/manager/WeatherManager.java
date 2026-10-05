@@ -211,7 +211,7 @@ public class WeatherManager {
     }
 
     public void getInformation(CommandSender sender) {
-        sender.sendMessage("[RECEIVED] Type: " + status + ". Wind volume: " + windVolume + ". Wind speed: " + windSpeed + "m/s. Temperature: " + temperature + " degrees. Visibility: " + visibility + " chunks.");
+        sender.sendMessage("[RECEIVED] Type: " + status + ". Wind.volume: " + windVolume + ".speed: " + windSpeed + "m/s." + ".deg: " + windDeg + ". Temperature: " + temperature + " degrees. Visibility: " + visibility + " chunks.");
         if (currentAmount > 0) {
             sender.sendMessage("[EVENT] There is a event going on now. The amount in " + values.getWeatherTicks() + " | " + values.getTimeTicks() + " ticks: " + currentAmount + ". The rate of fall: " + fallSpeed);
         }

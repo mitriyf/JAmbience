@@ -1,0 +1,19 @@
+  scoreboards:
+    default:
+      title: '&f&lWeather'
+      lines:
+      - ''
+      - '%jambience_color%&l➤ &fCity: %jambience_color%%jambience_name%'
+      - ' %jambience_color%》 &fTime: %jambience_color%%jambience_time%'
+      - ''
+      - '%jambience_color%✉ &fInformation:'
+      - ' %jambience_color%》 &fTemperature: %jambience_color%%jambience_temperature%%jambience_emoji%'
+      - ' %jambience_color%》 &fWind:'
+      - '   %jambience_color%о &fSpeed: %jambience_color%%jambience_windspeed% m/s'
+      - '   %jambience_color%о &fDeg: %jambience_color%%jambience_winddeg%°'
+      - ' %jambience_color%》 &fVisibility: %jambience_color%%jambience_visibility% chunks.'
+      - ' '
+      - '%jambience_color%☁ &fWeather Type:'
+      - ' %jambience_color%》 &fType: %jambience_color%%jambience_event%'
+      - ' %jambience_color%》 &fPrecipitation: %jambience_color%%jambience_amount%'
+      - ''

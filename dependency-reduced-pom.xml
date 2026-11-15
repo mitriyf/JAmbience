@@ -5,7 +5,7 @@
     <groupId>en.hider</groupId>
     <artifactId>JAmbience</artifactId>
     <name>JAmbience</name>
-    <version>1.1</version>
+    <version>1.2</version>
     <build>
         <resources>
             <resource>

@@ -63,7 +63,7 @@ public class WeatherEvents {
             for (Player player : world.getPlayers()) {
                 Location location = player.getLocation();
                 if (player.isDead() || values.getBiomeType().notContainsBiome(location.getBlock().getBiome())) {
-                    return;
+                    continue;
                 }
                 processPlayer(player, location);
             }

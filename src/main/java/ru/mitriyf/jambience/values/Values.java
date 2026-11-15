@@ -86,13 +86,13 @@ public class Values {
         FileConfiguration config = plugin.getConfig();
         ConfigurationSection settings = config.getConfigurationSection("settings");
         if (settings == null) {
-            logger.warning("В конфигурации отсутствует секция: settings");
+            logger.warning("The configuration lacks the following section: settings");
             return;
         }
         setupSettings(settings);
         ConfigurationSection messages = config.getConfigurationSection("messages");
         if (messages == null) {
-            logger.warning("В конфигурации отсутствует секция: messages");
+            logger.warning("The configuration lacks the following section: messages");
             return;
         }
         setupMessages(messages);
@@ -437,5 +437,7 @@ public class Values {
         }
         windSounds.clear();
         weatherTypes.clear();
+        worlds.clear();
+        biomes.clear();
     }
 }
